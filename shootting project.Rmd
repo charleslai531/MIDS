@@ -191,6 +191,54 @@ ggplot(crime_count_year, aes(x = year,
 ```
 **Overall from year 2006 to 2019, the number of crime decrease in long-run, from about 2000 cases in 2006 to less than 1000 cases in 2019.but from 2020, the cases bounce back strong and reaching the record high since 2006.**<br><br><br><br><br><br>
 
+```{r}
+# Assuming data is your data frame and it's already loaded
+# Install necessary package
+install.packages("rpart")
+library(rpart)
+
+# Split the data into training set and test set
+set.seed(123)
+train_index <- sample(1:nrow(nypd_project_data), nrow(nypd_project_data)*0.7)
+train_set <- nypd_project_data[train_index,]
+test_set <- nypd_project_data[-train_index,]
+
+# Build the decision tree model
+model <- rpart(BORO ~ VIC_SEX + VIC_AGE_GROUP + VIC_RACE + OCCUR_TIME, data = train_set, method = "class")
+
+# Make predictions on the test set
+predictions <- predict(model, test_set, type = "class")
+
+# Evaluate the model
+table(pred = predictions, true = test_set$BORO)
+
+```
+
+
+```{r}
+install.packages("randomForest")
+library(randomForest)
+
+nypd_project_data$BORO <- as.factor(nypd_project_data$BORO)
+nypd_project_data$VIC_SEX <- as.factor(nypd_project_data$VIC_SEX)
+nypd_project_data$VIC_RACE <- as.factor(nypd_project_data$VIC_RACE)
+
+
+model <- randomForest(VIC_AGE_GROUP ~ BORO + VIC_SEX + VIC_RACE + OCCUR_TIME, data = nypd_project_data)
+
+
+print(model)
+
+predictions <- predict(model, nypd_project_data)
+
+rmse <- sqrt(mean((nypd_project_data$Age - predictions)^2))
+print(rmse)
+```
+
+
+
+
+
 ## Step 4: Conclusion and Bias Identification<br><br>
 
 
